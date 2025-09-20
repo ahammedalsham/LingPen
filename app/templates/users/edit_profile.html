@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-8 rounded shadow mt-8">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Edit Your Profile</h1>
+
+  <form method="POST" enctype="multipart/form-data" id="profile-form">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-4">
+      {{ form.first_name.label(class="block text-gray-700") }}
+      {{ form.first_name(class="w-full px-3 py-2 border rounded") }}
+    </div>
+
+    <div class="mb-4">
+      {{ form.last_name.label(class="block text-gray-700") }}
+      {{ form.last_name(class="w-full px-3 py-2 border rounded") }}
+    </div>
+
+    <div class="mb-4">
+      {{ form.dob.label(class="block text-gray-700") }}
+      {{ form.dob(class="w-full px-3 py-2 border rounded") }}
+    </div>
+
+    <div class="mb-4">
+      {{ form.primary_language.label(class="block text-gray-700") }}
+      {{ form.primary_language(class="w-full px-3 py-2 border rounded") }}
+    </div>
+
+    <div class="mb-4">
+      {{ form.interests.label(class="block text-gray-700") }}
+      {{ form.interests(class="w-full px-3 py-2 border rounded") }}
+    </div>
+
+    <div class="mb-4">
+      {{ form.about.label(class="block text-gray-700") }}
+      {{ form.about(class="w-full px-3 py-2 border rounded h-24") }}
+    </div>
+
+    <!-- Profile Picture Cropper -->
+    <div class="mb-4">
+      {{ form.photo.label(class="block text-gray-700") }}
+      <input type="file" id="photo-input" accept="image/*" class="block">
+      <input type="hidden" name="photo" id="photo-data">
+      <div class="mt-2">
+        <img id="photo-preview" style="max-width: 100%; display: none;">
+      </div>
+      {% if current_user.profile and current_user.profile.photo_url %}
+        <img src="{{ current_user.profile.photo_url }}" alt="Profile Picture" class="w-24 h-24 rounded mt-2">
+      {% endif %}
+    </div>
+
+    <!-- Cover Image Cropper -->
+    <div class="mb-4">
+      {{ form.cover.label(class="block text-gray-700") }}
+      <input type="file" id="cover-input" accept="image/*" class="block">
+      <input type="hidden" name="cover" id="cover-data">
+      <div class="mt-2">
+        <img id="cover-preview" style="width: 100%; display: none;">
+      </div>
+      {% if current_user.profile and current_user.profile.cover_url %}
+        <img src="{{ current_user.profile.cover_url }}" alt="Cover Image" class="w-full h-48 object-cover rounded mt-2">
+      {% endif %}
+    </div>
+
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save Changes</button>
+  </form>
+</div>
+
+<!-- Cropper.js CSS & JS -->
+<link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+<script>
+let photoCropper, coverCropper;
+
+document.getElementById('photo-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const photoPreview = document.getElementById('photo-preview');
+  photoPreview.style.display = 'block';
+  photoPreview.src = URL.createObjectURL(file);
+
+  if (photoCropper) photoCropper.destroy();
+  photoCropper = new Cropper(photoPreview, {
+    aspectRatio: 1,
+    viewMode: 1,
+    movable: true,
+    zoomable: true,
+    scalable: true,
+    crop(event) {
+      const canvas = photoCropper.getCroppedCanvas({
+        width: 300,
+        height: 300
+      });
+      document.getElementById('photo-data').value = canvas.toDataURL('image/jpeg');
+    }
+  });
+});
+
+document.getElementById('cover-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const coverPreview = document.getElementById('cover-preview');
+  coverPreview.style.display = 'block';
+  coverPreview.src = URL.createObjectURL(file);
+
+  if (coverCropper) coverCropper.destroy();
+  coverCropper = new Cropper(coverPreview, {
+    aspectRatio: 16 / 9,
+    viewMode: 1,
+    movable: true,
+    zoomable: true,
+    scalable: true,
+    crop(event) {
+      const canvas = coverCropper.getCroppedCanvas({
+        width: 1200,
+        height: 675
+      });
+      document.getElementById('cover-data').value = canvas.toDataURL('image/jpeg');
+    }
+  });
+});
+</script>
+{% endblock %}

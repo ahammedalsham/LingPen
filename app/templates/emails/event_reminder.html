@@ -1,0 +1,8 @@
+<h2>Event Reminder</h2>
+<p>Hello {{ user.first_name or user.email }},</p>
+<p>This is a reminder for your upcoming event:</p>
+<ul>
+  <li><strong>{{ event.title }}</strong></li>
+  <li><strong>Date:</strong> {{ event.date.strftime('%Y-%m-%d %H:%M') }}</li>
+</ul>
+<p>Don't miss it!</p>

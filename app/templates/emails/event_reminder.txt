@@ -1,0 +1,7 @@
+Hello {{ user.first_name or user.email }},
+
+This is a reminder for your upcoming event:
+{{ event.title }}
+Date: {{ event.date.strftime('%Y-%m-%d %H:%M') }}
+
+Don't miss it!

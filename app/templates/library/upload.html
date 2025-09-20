@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-md mx-auto bg-white shadow p-6 rounded">
+  <h1 class="text-xl font-bold mb-4">{{ heading }}</h1>
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      {{ form.title.label(class="block text-sm font-medium") }}
+      {{ form.title(class="w-full border rounded p-2") }}
+    </div>
+    <div class="mb-3">
+      {{ form.description.label(class="block text-sm font-medium") }}
+      {{ form.description(class="w-full border rounded p-2") }}
+    </div>
+    <div class="mb-3">
+      {{ form.file.label(class="block text-sm font-medium") }}
+      {{ form.file(class="w-full") }}
+    </div>
+    {{ form.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+  </form>
+</div>
+{% endblock %}

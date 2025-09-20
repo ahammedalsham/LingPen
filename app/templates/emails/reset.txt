@@ -1,0 +1,6 @@
+We received a request to reset your LingPen password.
+
+Click the link below to set a new one:
+{{ link }}
+
+If you did not request this, please ignore this message.

@@ -1,0 +1,9 @@
+Hello {{ user.first_name or user.email }},
+
+You have successfully enrolled in the course:
+{{ course.title }}
+
+Description:
+{{ course.description }}
+
+Happy learning!

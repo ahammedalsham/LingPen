@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}LingPen{% endblock %}</title>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <!-- Alpine.js for lightweight reactivity (used by comment components) -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="{{ url_for('static', filename='logo/lingpen_logo.png') }}">
+</head>
+<body class="bg-gray-100 text-gray-900 flex flex-col min-h-screen">
+
+<!-- TOP NAVBAR -->
+<nav class="bg-white shadow-md border-b border-blue-200">
+  <div class="max-w-7xl mx-auto px-3 py-0 flex items-center justify-between">
+
+    <!-- Left: Logo -->
+    <div class="flex items-center">
+      <img src="{{ url_for('static', filename='logo/lingpen_logo.png') }}"
+           alt="LingPen Logo"
+           class="h-16 w-auto" />
+    </div>
+
+    <!-- Center: Site Title -->
+    <div class="flex-1 text-center">
+      <a href="{{ url_for('home') }}"
+         class="text-blue-700 text-3xl font-bold"
+         style="font-family: 'Times New Roman', serif;">
+        LingPen.com
+      </a>
+    </div>
+
+    <!-- Right: Language Switcher -->
+    <div class="w-28 flex justify-end relative dropdown-wrapper">
+      <button type="button"
+              class="flex items-center space-x-1 text-gray-600 hover:text-indigo-600 text-sm focus:outline-none"
+              data-dropdown-toggle="langDropdown" aria-expanded="false">
+        <span>🌐</span>
+        <span id="currentLang">EN</span>
+      </button>
+      <div id="langDropdown"
+           class="absolute right-0 mt-2 w-24 bg-white shadow rounded-md py-1 z-50 hidden dropdown">
+        <a href="#" class="block px-4 py-2 hover:bg-gray-100 text-sm" data-lang="EN">English</a>
+        <a href="#" class="block px-4 py-2 hover:bg-gray-100 text-sm" data-lang="AR">العربية</a>
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+<!-- SECOND NAVBAR (STICKY) -->
+<nav class="bg-white shadow-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between h-16">
+
+      <!-- Left Section: Nav Links -->
+      <div class="flex items-center space-x-6">
+        <a href="{{ url_for('home') }}" class="text-gray-700 hover:text-blue-600">Home</a>
+
+        <!-- Explore dropdown -->
+        <div class="relative dropdown-wrapper">
+          <button type="button"
+                  class="text-gray-700 hover:text-blue-600 focus:outline-none"
+                  data-dropdown-toggle="exploreDropdown" aria-expanded="false">
+            Explore
+          </button>
+          <div id="exploreDropdown"
+               class="absolute left-0 mt-2 w-40 bg-white border rounded-md shadow-lg hidden z-50 dropdown">
+            <a href="{{ url_for('posts.index') }}" class="block px-4 py-2 hover:bg-gray-100">Posts</a>
+            <a href="{{ url_for('blogs.index') }}" class="block px-4 py-2 hover:bg-gray-100">Blogs</a>
+          </div>
+        </div>
+
+        <a href="{{ url_for('events.index') }}" class="text-gray-700 hover:text-blue-600">Events</a>
+        <a href="{{ url_for('courses.index') }}" class="text-gray-700 hover:text-blue-600">Courses</a>
+
+        <!-- Library dropdown -->
+        <div class="relative dropdown-wrapper">
+          <button type="button"
+                  class="text-gray-700 hover:text-blue-600 focus:outline-none"
+                  data-dropdown-toggle="libraryDropdown" aria-expanded="false">
+            Library
+          </button>
+          <div id="libraryDropdown"
+               class="absolute left-0 mt-2 w-48 bg-white border rounded-md shadow-lg hidden z-50 dropdown">
+            <a href="{{ url_for('library.readings') }}" class="block px-4 py-2 hover:bg-gray-100">Readings</a>
+            <a href="{{ url_for('library.user_library') }}" class="block px-4 py-2 hover:bg-gray-100">User Library</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Section: Search + Notifications + Profile -->
+      <div class="flex items-center space-x-4">
+        <!-- Search -->
+        <form method="GET" action="{{ url_for('home') }}" class="hidden sm:block">
+          <input type="text" name="q" placeholder="Search..." class="px-2 py-1 border rounded-md text-sm">
+        </form>
+
+        <!-- Notifications -->
+        <a href="{{ url_for('home') }}" class="relative">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700 hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+
+        <!-- Profile dropdown -->
+        {% if current_user.is_authenticated %}
+        <div class="relative dropdown-wrapper">
+          <button type="button" aria-label="Open profile menu"
+                  class="h-8 w-8 rounded-full overflow-hidden focus:outline-none"
+                  data-dropdown-toggle="profileDropdown" aria-expanded="false">
+            <img src="{{ url_for('static', filename='pro_pics/' + (current_user.profile_photo or 'default.jpg')) }}"
+                alt="Profile" class="h-8 w-8">
+          </button>
+
+          <div id="profileDropdown"
+              class="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg hidden z-50 dropdown">
+
+            <a href="{{ url_for('users.profile', user_id=current_user.id) }}" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+            <a href="{{ url_for('users.edit_profile', user_id=current_user.id) }}" class="block px-4 py-2 hover:bg-gray-100">Edit Profile</a>
+
+            <!-- Correct Logout Form -->
+            <form method="POST" action="{{ url_for('auth.logout') }}">
+              <button type="submit" class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                Logout
+              </button>
+            </form>
+
+          </div>
+        </div>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}" class="text-gray-700 hover:text-blue-600">Login</a>
+          <a href="{{ url_for('auth.register') }}" class="text-gray-700 hover:text-blue-600">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Flash Messages -->
+<div class="max-w-3xl mx-auto mt-4 px-4">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="mb-3 p-3 rounded-lg text-white 
+          {% if category == 'success' %}bg-green-500
+          {% elif category == 'danger' %}bg-red-500
+          {% else %}bg-blue-500{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
+
+
+<!-- MAIN CONTENT -->
+<main class="flex-grow max-w-7xl mx-auto px-14 py-8 w-full">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer class="bg-white border-t mt-10">
+  <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row justify-between items-center">
+    <p class="text-sm text-gray-500">&copy; {{ current_year }} LingPen. All rights reserved.</p>
+    <div class="flex space-x-4 text-sm">
+      <a href="{{ url_for('general.about') }}" class="text-gray-500 hover:text-blue-600">About</a>
+      <a href="{{ url_for('general.contact') }}" class="text-gray-500 hover:text-blue-600">Contact</a>
+      <a href="{{ url_for('general.faq') }}" class="text-gray-500 hover:text-blue-600">FAQ</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Script for dropdown toggle (click-to-toggle + outside click + Esc) -->
+<script>
+  (function () {
+    function closeAll(exceptId) {
+      document.querySelectorAll('.dropdown').forEach(menu => {
+        if (!exceptId || menu.id !== exceptId) menu.classList.add('hidden');
+      });
+      document.querySelectorAll('[data-dropdown-toggle]').forEach(btn => {
+        if (!exceptId || btn.getAttribute('data-dropdown-toggle') !== exceptId) {
+          btn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    function openMenu(id) {
+      const menu = document.getElementById(id);
+      const btn = document.querySelector('[data-dropdown-toggle="' + id + '"]');
+      if (!menu || !btn) return;
+      menu.classList.remove('hidden');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+
+    function toggleMenu(id) {
+      const menu = document.getElementById(id);
+      if (!menu) return;
+      const isHidden = menu.classList.contains('hidden');
+      closeAll(id);
+      if (isHidden) openMenu(id); else menu.classList.add('hidden');
+    }
+
+    // Delegate clicks for all toggles
+    document.addEventListener('click', function (e) {
+      const toggleBtn = e.target.closest('[data-dropdown-toggle]');
+      if (toggleBtn) {
+        e.preventDefault();
+        const id = toggleBtn.getAttribute('data-dropdown-toggle');
+        toggleMenu(id);
+        return;
+      }
+
+      // Click outside any dropdown wrapper -> close all
+      if (!e.target.closest('.dropdown-wrapper')) {
+        closeAll();
+      }
+    });
+
+    // Close on Escape
+    window.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeAll();
+    });
+
+    // Close on resize (prevents odd positions when layout changes)
+    window.addEventListener('resize', function () {
+      closeAll();
+    });
+  })();
+</script>
+
+</body>
+</html>

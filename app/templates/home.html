@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% block title %}Home - LingPen{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden">
+    <!-- Animated Background: layered SVG blobs + IPA glyphs -->
+    <div aria-hidden="true" class="absolute inset-0 -z-10 pointer-events-none">
+      <!-- Soft blurred gradient blobs -->
+      <svg class="absolute -top-44 -left-36 w-[28rem] h-[28rem] opacity-40 blur-2xl animate-blob-slow" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="g1" x1="0%" x2="100%" y1="0%" y2="100%">
+            <stop stop-color="#60a5fa" offset="0%" />
+            <stop stop-color="#7c3aed" offset="50%" />
+            <stop stop-color="#f472b6" offset="100%" />
+          </linearGradient>
+        </defs>
+        <g>
+          <path fill="url(#g1)" d="M421.6,346.8Q403,443.6,322.2,469Q241.4,494.4,171.7,452.9Q102,411.4,69.9,343.4Q37.8,275.4,78.9,200.6Q120,125.8,193.6,96.2Q267.2,66.6,339.8,92.8Q412.4,119,435.6,190Q458.8,261,421.6,346.8Z"></path>
+        </g>
+      </svg>
+
+      <!-- Rotating large blur blob -->
+      <div class="absolute top-56 right-16 w-[36rem] h-[36rem] rounded-full bg-gradient-to-bl from-pink-300 via-purple-300 to-blue-300 opacity-20 blur-3xl animate-spin-slow"></div>
+
+      <!-- Floating IPA glyphs (linguistic theme) -->
+      <div class="absolute inset-0 flex pointer-events-none">
+        <span class="ipa floating -left-10 top-20 text-6xl text-[rgba(15,23,42,0.06)]">/ŋ/</span>
+        <span class="ipa floating delay-1 left-1/4 top-40 text-5xl text-[rgba(15,23,42,0.05)]">/θ/</span>
+        <span class="ipa floating delay-2 left-1/2 top-8 text-7xl text-[rgba(15,23,42,0.04)]">/ɹ/</span>
+        <span class="ipa floating delay-3 right-14 top-56 text-6xl text-[rgba(15,23,42,0.05)]">/ʃ/</span>
+      </div>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="max-w-[85rem] mx-auto px-6 py-24 text-center">
+      <h1 class="font-extrabold text-gray-900 text-4xl md:text-6xl lg:text-7xl tracking-tight leading-tight">
+        Connect, Learn & Share <br>
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient">
+          With Linguists Worldwide
+        </span>
+      </h1>
+
+      <p class="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-gray-700">
+        Join our global community. Explore posts, share research, and grow together.
+      </p>
+
+      <div class="mt-8 flex justify-center gap-4">
+        <a href="{{ url_for('auth.register') }}"
+           class="px-6 py-3 rounded-xl bg-blue-600 text-white text-sm md:text-base font-semibold shadow-md hover:shadow-xl hover:bg-blue-700 transition transform hover:-translate-y-1">
+          Get Started →
+        </a>
+        <a href="#explore"
+           class="px-6 py-3 rounded-xl border border-gray-300 text-gray-800 text-sm md:text-base font-semibold bg-white/50 backdrop-blur-sm hover:bg-gray-100 transition transform hover:-translate-y-1">
+          Explore Content
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="reveal max-w-[85rem] mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
+  <div class="card-animate p-6 bg-white/80 rounded-xl shadow">
+      <p class="text-2xl font-bold text-blue-600">{{ users|length }}</p>
+      <p class="text-gray-600 text-sm">Members</p>
+    </div>
+  <div class="card-animate p-6 bg-white/80 rounded-xl shadow">
+      <p class="text-2xl font-bold text-purple-600">{{ posts|length }}</p>
+      <p class="text-gray-600 text-sm">Posts</p>
+    </div>
+  <div class="card-animate p-6 bg-white/80 rounded-xl shadow">
+      <p class="text-2xl font-bold text-pink-600">{{ blogs|length }}</p>
+      <p class="text-gray-600 text-sm">Blogs</p>
+    </div>
+  <div class="card-animate p-6 bg-white/80 rounded-xl shadow">
+      <p class="text-2xl font-bold text-green-600">{{ pdfs|length }}</p>
+      <p class="text-gray-600 text-sm">PDFs</p>
+    </div>
+  <div class="card-animate p-6 bg-white/80 rounded-xl shadow">
+      <p class="text-2xl font-bold text-indigo-600">{{ events|length }}</p>
+      <p class="text-gray-600 text-sm">Events</p>
+    </div>
+  </section>
+
+  <!-- Community Members -->
+  <section id="community" class="reveal max-w-[85rem] mx-auto px-6 py-16">
+    <h2 class="text-3xl font-bold text-center mb-10">
+      Meet Our <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">Community</span>
+    </h2>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
+      {% for user in users %}
+  <div class="group card-animate bg-white/70 backdrop-blur-md rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:bg-white/90">
+          {% if user.profile.photo_url %}
+            <img src="{{ user.profile.photo_url }}" class="w-20 h-20 mx-auto rounded-full border-4 border-white shadow mb-3 object-cover">
+          {% else %}
+            <div class="w-20 h-20 mx-auto flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-bold mb-3">
+              {{ (user.profile.first_name or user.email)[0] | upper }}
+            </div>
+          {% endif %}
+          <p class="font-semibold">{{ user.profile.first_name or user.email }}</p>
+          <p class="text-sm text-gray-600 truncate">{{ user.email }}</p>
+          <p class="text-xs text-gray-500 mt-1">👥 {{ user.followers.count() }} followers</p>
+          <a href="{{ url_for('users.profile', user_id=user.id) }}" class="mt-2 inline-block text-sm text-blue-600 hover:underline">View Profile</a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Recent Posts -->
+  <section id="explore" class="reveal max-w-[85rem] mx-auto px-6 py-16">
+    <h2 class="text-3xl font-bold text-center mb-10">Recent Posts</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for post in posts[:6] %}
+  <div class="bg-white rounded-xl shadow card-animate p-5">
+          <div class="flex items-center mb-3">
+            <img src="{{ post.user.profile.photo_url or url_for('static', filename='default-avatar.png') }}" class="w-10 h-10 rounded-full mr-3">
+            <div>
+              <p class="font-semibold">{{ post.user.profile.first_name or post.user.email }}</p>
+              <p class="text-xs text-gray-500">{{ post.created_at.strftime("%b %d, %Y") }}</p>
+            </div>
+          </div>
+          <p class="text-gray-700">{{ post.body[:120] }}...</p>
+          <a href="{{ url_for('posts.detail', post_id=post.id) }}" class="text-blue-600 text-sm mt-3 inline-block">Read More →</a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Recent Blogs -->
+  <section class="reveal max-w-[85rem] mx-auto px-6 py-16">
+    <h2 class="text-3xl font-bold text-center mb-10">Recent Blogs</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for blog in blogs[:6] %}
+  <div class="bg-white rounded-xl shadow card-animate overflow-hidden">
+          {% if blog.cover_image %}
+            <img src="{{ blog.cover_image }}" class="h-40 w-full object-cover hover:scale-105 transition-transform duration-400 ease-out">
+          {% endif %}
+          <div class="p-5">
+            <h3 class="font-semibold text-lg">{{ blog.title }}</h3>
+            <p class="text-sm text-gray-600 mt-2">{{ blog.body[:100] }}...</p>
+            <a href="{{ url_for('blogs.detail', blog_id=blog.id) }}" class="text-blue-600 text-sm mt-3 inline-block">Read More →</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="reveal bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16 text-center">
+    <h2 class="text-3xl font-bold mb-4">Be Part of the LingPen Community</h2>
+    <p class="mb-6 text-lg">Start sharing your research, posts, and blogs with linguists worldwide.</p>
+    <a href="{{ url_for('auth.register') }}" class="px-6 py-3 rounded-xl bg-white text-blue-700 font-semibold hover:bg-gray-100 transition">Join Now</a>
+  </section>
+
+</div>
+
+<style>
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 6s ease infinite;
+  }
+  .animate-spin-slow {
+    animation: spin 20s linear infinite;
+  }
+  /* Blob morph */
+  @keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(10px, -20px) scale(1.05); }
+    66% { transform: translate(-10px, 10px) scale(0.95); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
+  .animate-blob-slow { animation: blob 18s ease-in-out infinite; transform-origin: center; }
+
+  /* Floating IPA glyphs */
+  .ipa { position: absolute; font-family: 'Georgia', serif; line-height: 1; user-select: none; }
+  .floating { animation: floatY 8s ease-in-out infinite; opacity: 0.9; }
+  .floating.delay-1 { animation-delay: 1.6s; }
+  .floating.delay-2 { animation-delay: 3.2s; }
+  .floating.delay-3 { animation-delay: 4.8s; }
+  @keyframes floatY {
+    0% { transform: translateY(0px) rotate(-2deg); }
+    50% { transform: translateY(-18px) rotate(2deg); }
+    100% { transform: translateY(0px) rotate(-2deg); }
+  }
+
+  /* Reveal-on-scroll */
+  .reveal { opacity: 0; transform: translateY(18px) scale(0.995); transition: opacity 600ms ease, transform 600ms ease; will-change: opacity, transform; }
+  .reveal.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+
+  /* Card hover lift subtle shadow */
+  .card-animate { transition: transform 250ms cubic-bezier(.2,.9,.2,1), box-shadow 250ms ease; }
+  .card-animate:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,23,0.12); }
+</style>
+
+<script>
+  // Parallax mousemove for subtle depth
+  (function () {
+    const parallaxLayer = document.querySelectorAll('.ipa, .animate-blob-slow, .-z-10');
+    function onMove(e) {
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      const dx = (e.clientX - cx) / cx; // -1 .. 1
+      const dy = (e.clientY - cy) / cy;
+      document.querySelectorAll('.ipa').forEach((el, i) => {
+        const depth = (i % 4 + 1) * 6; // layer depth
+        el.style.transform = `translate3d(${dx * depth}px, ${dy * depth}px, 0) ${el.style.transform.replace(/translate3d\([^)]*\)/, '')}`;
+      });
+      // subtle rotate for big blob
+      const blob = document.querySelector('.animate-blob-slow');
+      if (blob) blob.style.transform = `translate3d(${dx * 12}px, ${dy * 12}px, 0) rotate(${dx * 6}deg)`;
+    }
+    window.addEventListener('mousemove', onMove);
+
+    // Reveal on scroll using IntersectionObserver
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('is-visible');
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  })();
+</script>
+{% endblock %}

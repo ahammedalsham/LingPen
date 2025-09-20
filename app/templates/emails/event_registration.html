@@ -1,0 +1,9 @@
+<h2>Event Registration Successful</h2>
+<p>Hello {{ user.first_name or user.email }},</p>
+<p>You have successfully registered for the event:</p>
+<ul>
+  <li><strong>{{ event.title }}</strong></li>
+  <li><strong>Date:</strong> {{ event.date.strftime('%Y-%m-%d %H:%M') }}</li>
+  <li>{{ event.description }}</li>
+</ul>
+<p>See you there!</p>

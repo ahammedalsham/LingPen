@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-2xl mx-auto p-6 bg-white shadow rounded">
+  <h1 class="text-xl font-bold mb-4">Create Event</h1>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-4">
+      {{ form.title.label(class="block text-sm font-medium text-gray-700") }}
+      {{ form.title(class="w-full border rounded p-2 mt-1") }}
+      {% for e in form.title.errors %}<p class="text-red-600 text-sm">{{ e }}</p>{% endfor %}
+    </div>
+    <div class="mb-4">
+      {{ form.description.label(class="block text-sm font-medium text-gray-700") }}
+      {{ form.description(class="w-full border rounded p-2 mt-1 h-40") }}
+      {% for e in form.description.errors %}<p class="text-red-600 text-sm">{{ e }}</p>{% endfor %}
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        {{ form.date.label(class="block text-sm font-medium text-gray-700") }}
+        {{ form.date(class="w-full border rounded p-2 mt-1") }}
+      </div>
+      <div>
+        {{ form.capacity.label(class="block text-sm font-medium text-gray-700") }}
+        {{ form.capacity(class="w-full border rounded p-2 mt-1") }}
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        {{ form.image.label(class="block text-sm font-medium text-gray-700") }}
+        {{ form.image(class="w-full border rounded p-2 mt-1") }}
+      </div>
+      <div class="flex items-center mt-6">
+        {{ form.is_online() }}
+        <label class="ml-2 text-sm text-gray-700" for="{{ form.is_online.id }}">Online Event</label>
+      </div>
+    </div>
+    <button class="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+  </form>
+</div>
+{% endblock %}

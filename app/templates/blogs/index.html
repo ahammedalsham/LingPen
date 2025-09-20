@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Blogs{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-4">
+  <h1 class="text-xl font-semibold">Blogs</h1>
+  {% if current_user.is_authenticated %}
+    <a href="{{ url_for('blogs.create') }}" class="px-3 py-1 border rounded">New Blog</a>
+  {% endif %}
+</div>
+
+<div class="grid md:grid-cols-2 gap-4">
+{% for blog in blogs.items %}
+  <div class="border rounded-md p-4 bg-white">
+    <div class="flex justify-between items-start">
+      <div>
+        <div class="font-medium"><a href="{{ url_for('users.profile', user_id=blog.user.id) }}">{{ blog.user.profile.first_name or blog.user.email }}</a></div>
+        <div class="text-xs text-gray-500">{{ blog.created_at.strftime('%Y-%m-%d') }}</div>
+      </div>
+      <div class="text-sm">{{ blog.likes.count() }} ❤️</div>
+    </div>
+    <h2 class="mt-3 font-semibold"><a href="{{ url_for('blogs.detail', blog_id=blog.id) }}">{{ blog.title }}</a></h2>
+    <p class="mt-2 text-sm text-gray-700">{{ blog.body[:200] }}{% if blog.body|length > 200 %}...{% endif %}</p>
+    <div class="mt-3">
+      <a class="text-sm underline" href="{{ url_for('blogs.detail', blog_id=blog.id) }}">Read</a>
+      {% if current_user.is_authenticated and (current_user.id==blog.user_id or current_user.is_admin) %}
+        <a href="{{ url_for('blogs.edit', blog_id=blog.id) }}" class="text-sm underline ml-2">Edit</a>
+        <form method="post" action="{{ url_for('blogs.delete', blog_id=blog.id) }}" class="inline">
+          <button class="text-sm underline ml-2">Delete</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+{% endfor %}
+</div>
+
+<div class="mt-4">
+  {% if blogs.has_prev %}<a href="{{ url_for('blogs.index', page=blogs.prev_num) }}" class="px-2">Prev</a>{% endif %}
+  {% if blogs.has_next %}<a href="{{ url_for('blogs.index', page=blogs.next_num) }}" class="px-2">Next</a>{% endif %}
+</div>
+{% endblock %}

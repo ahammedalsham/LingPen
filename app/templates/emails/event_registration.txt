@@ -1,0 +1,8 @@
+Hello {{ user.first_name or user.email }},
+
+You have successfully registered for the event:
+{{ event.title }}
+Date: {{ event.date.strftime('%Y-%m-%d %H:%M') }}
+Description: {{ event.description }}
+
+See you there!

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-3xl mx-auto p-4">
+  <div class="bg-white shadow rounded p-6">
+    <div class="flex items-start justify-between">
+      <div>
+        <h1 class="text-2xl font-bold">{{ event.title }}</h1>
+        <p class="text-gray-600 mt-1">{{ event.date.strftime('%Y-%m-%d %H:%M') }} · {{ 'Online' if event.is_online else 'Offline' }}</p>
+        <p class="mt-4 whitespace-pre-line">{{ event.description }}</p>
+      </div>
+      {% if event.image %}
+      <img src="{{ event.image }}" alt="Event image" class="w-40 h-24 object-cover rounded ml-4">
+      {% endif %}
+    </div>
+
+    <div class="mt-4 flex items-center justify-between">
+      <div class="text-sm text-gray-700">Spots left: <strong>{{ event.spots_left }}</strong> / {{ event.capacity }}</div>
+      <div class="text-sm">
+        <span class="font-semibold">Starts in: </span>
+        <span id="countdown" class="ml-1">—</span>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      {% if current_user.is_authenticated %}
+        {% if user_is_registered %}
+          <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded">You are registered ✅</span>
+        {% elif event.spots_left > 0 %}
+          <form method="POST" action="{{ url_for('events.register', event_id=event.id) }}">
+            <button class="bg-blue-600 text-white px-4 py-2 rounded">Register</button>
+          </form>
+        {% else %}
+          <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded">Event Full</span>
+        {% endif %}
+      {% else %}
+        <p class="text-gray-600">Please log in to register.</p>
+      {% endif %}
+    </div>
+
+    {% if current_user.is_authenticated and current_user.is_admin %}
+    <div class="mt-6 flex space-x-3">
+      <a href="{{ url_for('events.edit', event_id=event.id) }}" class="px-3 py-2 bg-yellow-500 text-white rounded">Edit</a>
+      <form method="POST" action="{{ url_for('events.delete', event_id=event.id) }}" onsubmit="return confirm('Delete this event?')">
+        <button class="px-3 py-2 bg-red-600 text-white rounded">Delete</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+(function(){
+  const target = new Date("{{ event.date.strftime('%Y-%m-%dT%H:%M:%S') }}Z").getTime();
+  const el = document.getElementById('countdown');
+  function tick() {
+    const now = new Date().getTime();
+    const diff = target - now;
+    if (diff <= 0) { el.textContent = "Started"; return; }
+    const d = Math.floor(diff / (1000*60*60*24));
+    const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+    const m = Math.floor((diff % (1000*60*60)) / (1000*60));
+    const s = Math.floor((diff % (1000*60)) / 1000);
+    el.textContent = `${d}d ${h}h ${m}m ${s}s`;
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+{% endblock %}
