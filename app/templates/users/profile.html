@@ -2,153 +2,191 @@
 {% block title %}{{ user.username }}'s Profile{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-100 py-8">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-10">
 
-  <!-- Cover Image -->
-  <div class="relative">
-    <img src="{{ user.profile.cover_url or url_for('static', filename='default_cover.jpg') }}" alt="Cover Image" class="w-full h-64 object-cover rounded-b-lg shadow-md">
+  <!-- Cover Section -->
+  <div class="relative group">
+    <img src="{{ user.profile.cover_url or url_for('static', filename='default_cover.jpg') }}" 
+         alt="Cover Image" 
+         class="w-full h-80 object-cover rounded-b-3xl shadow-lg transition-transform duration-700 group-hover:scale-105">
 
-    <!-- Profile Picture -->
-    <div class="absolute -bottom-12 left-10">
-      <img src="{{ user.profile.photo_url or url_for('static', filename='default_avatar.png') }}" alt="Profile Picture" class="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover">
+    <!-- Gradient Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent rounded-b-3xl"></div>
+
+      <!-- Profile Picture + Info Card -->
+      <div class="absolute -bottom-16 left-10 flex items-center space-x-1">
+      
+        <!-- Profile Picture -->
+        <img src="{{ user.profile.photo_url or url_for('static', filename='default_avatar.png') }}" 
+            alt="Profile Picture" 
+            class="w-40 h-40 rounded-full border-4 border-white shadow-2xl object-cover transform hover:scale-105 transition duration-300">
+        
+        <!-- Info Card -->
+        <div class="bg-white rounded-xl shadow-lg px-6 py-4 -ml-6">
+          <h1 class="text-2xl font-bold text-gray-900">
+            {{ user.profile.first_name or '' }} {{ user.profile.last_name or user.username }}
+          </h1>
+          <p class="text-sm text-gray-600 mt-1">
+            {{ user.email }}
+          </p>
+        </div>
     </div>
-  </div>
+  </div>  
 
-  <!-- Profile Info Card -->
-  <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md mt-16 p-6 text-center">
-    <h1 class="text-3xl font-bold text-gray-800">{{ user.profile.first_name or '' }} {{ user.profile.last_name or user.username }}</h1>
-    <p class="text-gray-600">{{ user.email }}</p>
 
-    <div class="flex justify-center space-x-8 mt-4 text-gray-700">
-      <div>
-        <span class="font-semibold text-lg">{{ total_likes }}</span><br> Likes
+  <!-- Profile Info -->
+  <div class="max-w-5xl mx-auto bg-white/80 backdrop-blur-md rounded-2xl shadow-lg mt-24 p-8 text-center transition hover:shadow-2xl duration-500">
+    
+    <!-- Stats -->
+    <div class="flex justify-center gap-12 mt-4 text-gray-700">
+      <div class="hover:scale-110 transition">
+        <span class="font-semibold text-2xl text-blue-600">{{ total_likes }}</span>
+        <p class="text-sm">Likes</p>
       </div>
-      <div>
-        <span class="font-semibold text-lg">{{ followers_count }}</span><br> Followers
+      <div class="hover:scale-110 transition">
+        <span class="font-semibold text-2xl text-purple-600">{{ followers_count }}</span>
+        <p class="text-sm">Followers</p>
       </div>
-      <div>
-        <span class="font-semibold text-lg">{{ following_count }}</span><br> Following
+      <div class="hover:scale-110 transition">
+        <span class="font-semibold text-2xl text-green-600">{{ following_count }}</span>
+        <p class="text-sm">Following</p>
       </div>
     </div>
 
+    <!-- Follow/Message Buttons -->
     {% if current_user.is_authenticated and current_user.id != user.id %}
-    <div class="flex justify-center space-x-4 mt-4">
+    <div class="flex justify-center space-x-4 mt-6">
       {% if current_user.is_following(user) %}
         <form action="{{ url_for('users.unfollow', user_id=user.id) }}" method="POST">
-          <button type="submit" class="px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Unfollow</button>
+          <button type="submit" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 shadow">Unfollow</button>
         </form>
       {% else %}
         <form action="{{ url_for('users.follow', user_id=user.id) }}" method="POST">
-          <button type="submit" class="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Follow</button>
+          <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow">Follow</button>
         </form>
       {% endif %}
-      <a href="{{ url_for('users.profile', user_id=user.id) }}" class="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600">Message</a>
+      <a href="{{ url_for('users.profile', user_id=user.id) }}" 
+         class="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl shadow hover:scale-105 transition">
+        Message
+      </a>
     </div>
     {% endif %}
 
+    <!-- About -->
     {% if user.profile.about %}
-      <div class="mt-6">
-        <h2 class="text-xl font-semibold text-gray-800">About</h2>
-        <p class="text-gray-700 mt-1">{{ user.profile.about }}</p>
+      <div class="mt-8 text-left">
+        <h2 class="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-2">About</h2>
+        <p class="text-gray-700 mt-3 leading-relaxed">{{ user.profile.about }}</p>
       </div>
     {% endif %}
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+    <!-- Extra Info -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 text-left">
       {% if user.profile.interests %}
-      <div>
+      <div class="p-4 bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition">
         <h3 class="font-semibold text-gray-800">Interests</h3>
-        <p class="text-gray-700 mt-1">{{ user.profile.interests }}</p>
+        <p class="text-gray-600 mt-1">{{ user.profile.interests }}</p>
       </div>
       {% endif %}
       {% if user.profile.primary_language %}
-      <div>
+      <div class="p-4 bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition">
         <h3 class="font-semibold text-gray-800">Primary Language</h3>
-        <p class="text-gray-700 mt-1">{{ user.profile.primary_language }}</p>
+        <p class="text-gray-600 mt-1">{{ user.profile.primary_language }}</p>
       </div>
       {% endif %}
     </div>
 
-    <div class="mt-6 text-sm text-gray-500">
-      Joined on {{ user.created_at.strftime('%B %d, %Y') }}
+    <div class="mt-8 text-sm text-gray-500 italic">
+      Member since {{ user.created_at.strftime('%B %d, %Y') }}
     </div>
   </div>
 
   <!-- Tabs -->
-  <div class="max-w-4xl mx-auto mt-8">
-    <div class="flex justify-center space-x-8 bg-white rounded shadow-md p-4">
-      <a href="{{ url_for('users.profile', user_id=user.id, tab='posts') }}" class="px-4 py-2 rounded {{ 'bg-blue-500 text-white' if tab == 'posts' else 'bg-gray-200' }}">Posts</a>
-      <a href="{{ url_for('users.profile', user_id=user.id, tab='blogs') }}" class="px-4 py-2 rounded {{ 'bg-blue-500 text-white' if tab == 'blogs' else 'bg-gray-200' }}">Blogs</a>
-      <a href="{{ url_for('users.profile', user_id=user.id, tab='pdfs') }}" class="px-4 py-2 rounded {{ 'bg-blue-500 text-white' if tab == 'pdfs' else 'bg-gray-200' }}">Library</a>
+  <div class="max-w-5xl mx-auto mt-12" x-data="{ tab: 'posts' }">
+    <!-- Tab Buttons -->
+    <div class="flex justify-center gap-6 bg-white/80 backdrop-blur-md rounded-2xl shadow p-4">
+      <template x-for="item in ['posts','blogs','pdfs']" :key="item">
+        <button @click="tab = item"
+          class="px-5 py-2 rounded-xl font-medium transition"
+          :class="tab === item 
+            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg scale-105' 
+            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+          <span x-text="item.charAt(0).toUpperCase() + item.slice(1)"></span>
+        </button>
+      </template>
     </div>
 
-    <div class="mt-6 bg-white rounded shadow-md p-6">
+    <!-- Content -->
+    <div class="mt-8 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-6">
 
-      {% if tab == 'posts' %}
-        {% for post in items.items %}
-          <div class="bg-white shadow rounded p-4 mb-3">
-            <p class="mb-2">{{ post.body }}</p>
+      <!-- Posts -->
+      <div x-show="tab === 'posts'" x-transition>
+        {% for post in posts %}
+          <div class="bg-white rounded-xl shadow p-4 mb-4 hover:shadow-md transition">
+            <p class="mb-2 text-gray-800">{{ post.body }}</p>
             <div class="flex justify-between text-sm text-gray-500">
-              <span>{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+              <span>📅 {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
               <span>❤ {{ post.likes.count() }} · 💬 {{ post.comments.count() }}</span>
             </div>
-            <a href="{{ url_for('posts.detail', post_id=post.id) }}" class="text-blue-600 text-sm mt-2 inline-block">View Post</a>
+            <a href="{{ url_for('posts.detail', post_id=post.id) }}" 
+               class="text-blue-600 text-sm mt-2 inline-block hover:underline">View Post</a>
           </div>
         {% else %}
-          <p class="text-gray-500">No posts yet.</p>
+          <p class="text-gray-500 italic">No posts yet.</p>
         {% endfor %}
+      </div>
 
-      {% elif tab == 'blogs' %}
-        {% for blog in items.items %}
-          <div class="bg-white shadow rounded p-4 mb-3">
-            <h2 class="text-lg font-bold mb-1">{{ blog.title }}</h2>
-            <p class="text-gray-700">{{ blog.body[:200] }}{% if blog.body|length > 200 %}...{% endif %}</p>
+      <!-- Blogs -->
+      <div x-show="tab === 'blogs'" x-transition>
+        {% for blog in blogs %}
+          <div class="bg-white rounded-xl shadow p-4 mb-4 hover:shadow-md transition">
+            <h2 class="text-lg font-bold text-gray-800">{{ blog.title }}</h2>
+            <p class="text-gray-700 mt-1">{{ blog.body[:200] }}{% if blog.body|length > 200 %}...{% endif %}</p>
             <div class="flex justify-between text-sm text-gray-500 mt-2">
-              <span>{{ blog.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+              <span>📅 {{ blog.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
               <span>❤ {{ blog.likes.count() }} · 💬 {{ blog.comments.count() }}</span>
             </div>
-            <a href="{{ url_for('blogs.detail', blog_id=blog.id) }}" class="text-blue-600 text-sm mt-2 inline-block">Read Blog</a>
+            <a href="{{ url_for('blogs.detail', blog_id=blog.id) }}" 
+               class="text-purple-600 text-sm mt-2 inline-block hover:underline">Read Blog</a>
           </div>
         {% else %}
-          <p class="text-gray-500">No blogs yet.</p>
+          <p class="text-gray-500 italic">No blogs yet.</p>
         {% endfor %}
+      </div>
 
-      {% elif tab == 'pdfs' %}
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold">My Library</h2>
+      <!-- Library -->
+      <div x-show="tab === 'pdfs'" x-transition>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-gray-800">📚 My Library</h2>
           {% if current_user.is_authenticated and current_user.id == user.id %}
-            <a href="{{ url_for('library.upload_user_pdf') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            <a href="{{ url_for('library.upload_user_pdf') }}" 
+               class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2 rounded-xl shadow hover:scale-105 transition">
               + Upload PDF
             </a>
           {% endif %}
         </div>
 
         <div class="space-y-4">
-          {% for pdf in items.items %}
-            <div class="bg-white shadow rounded p-4">
-              <h2 class="text-lg font-bold">{{ pdf.title }}</h2>
+          {% for pdf in pdfs %}
+            <div class="bg-white rounded-xl shadow p-4 hover:shadow-md transition">
+              <h2 class="text-lg font-bold text-gray-800">{{ pdf.title }}</h2>
               <p class="text-gray-700">{{ pdf.description }}</p>
-              <p class="text-sm text-gray-500">Uploaded on {{ pdf.uploaded_at.strftime('%Y-%m-%d') }}</p>
+              <p class="text-sm text-gray-500 mt-1">Uploaded on {{ pdf.uploaded_at.strftime('%Y-%m-%d') }}</p>
 
-              <a href="{{ url_for('library.download_pdf', kind='user', filename=pdf.filename) }}" class="text-blue-600 hover:underline">Download</a>
+              <div class="mt-2 flex gap-3">
+                <a href="{{ url_for('library.download_pdf', kind='user', filename=pdf.filename) }}" 
+                   class="text-blue-600 hover:underline">⬇ Download</a>
 
-              {% if current_user.is_authenticated and (current_user.id == pdf.user_id or current_user.is_admin) %}
-                <a href="{{ url_for('library.delete_pdf', kind='user', pdf_id=pdf.id) }}" class="text-red-600 ml-3 hover:underline">Delete</a>
-              {% endif %}
+                {% if current_user.is_authenticated and (current_user.id == pdf.user_id or current_user.is_admin) %}
+                  <a href="{{ url_for('library.delete_pdf', kind='user', pdf_id=pdf.id) }}" 
+                     class="text-red-600 hover:underline">🗑 Delete</a>
+                {% endif %}
+              </div>
             </div>
           {% else %}
-            <p class="text-gray-500">No PDFs uploaded yet.</p>
+            <p class="text-gray-500 italic">No PDFs uploaded yet.</p>
           {% endfor %}
         </div>
-      {% endif %}
-
-      <!-- Pagination -->
-      <div class="mt-4">
-        {% if items.has_prev %}
-          <a href="{{ url_for('users.profile', user_id=user.id, tab=tab, page=items.prev_num) }}" class="px-3 py-1 bg-gray-300 rounded">Previous</a>
-        {% endif %}
-        {% if items.has_next %}
-          <a href="{{ url_for('users.profile', user_id=user.id, tab=tab, page=items.next_num) }}" class="px-3 py-1 bg-gray-300 rounded">Next</a>
-        {% endif %}
       </div>
 
     </div>
