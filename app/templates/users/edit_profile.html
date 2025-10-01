@@ -89,8 +89,12 @@
          class="px-5 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 shadow">
         Cancel
       </a>
-      <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow">
-        Save Changes
+      <button id="save-btn" type="submit" class="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow flex items-center gap-3">
+        <svg id="save-spinner" class="w-5 h-5 animate-spin hidden text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <span id="save-text">Save Changes</span>
       </button>
     </div>
   </form>
@@ -165,6 +169,16 @@ document.getElementById('save-crop').addEventListener('click', function() {
 
   document.getElementById('cropper-modal').classList.add('hidden');
   cropper.destroy();
+});
+
+// Save button UX: show spinner and disable to prevent duplicate submits
+document.getElementById('profile-form').addEventListener('submit', function(e){
+  const btn = document.getElementById('save-btn');
+  const spinner = document.getElementById('save-spinner');
+  const txt = document.getElementById('save-text');
+  btn.disabled = true;
+  spinner.classList.remove('hidden');
+  txt.textContent = 'Saving...';
 });
 </script>
 {% endblock %}

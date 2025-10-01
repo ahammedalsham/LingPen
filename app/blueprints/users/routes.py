@@ -1,6 +1,7 @@
 import os
 import base64
 import uuid
+import time
 from flask import Blueprint, render_template, abort, request, redirect, url_for, flash
 from app.models import User, Post, Blog, UserPDF, Profile
 from app.extensions import db
@@ -57,7 +58,7 @@ def edit_profile():
             os.makedirs(os.path.dirname(path), exist_ok=True)
             with open(path, 'wb') as f:
                 f.write(base64.b64decode(photo_data.split(',', 1)[1]))
-            profile.photo_url = url_for('static', filename=f'pro_pics/{filename}')
+            profile.photo_url = url_for('static', filename=f'pro_pics/{filename}') + f"?v={int(time.time())}"
 
         # Cover image
         cover_data = request.form.get('cover')
@@ -67,7 +68,7 @@ def edit_profile():
             os.makedirs(os.path.dirname(path), exist_ok=True)
             with open(path, 'wb') as f:
                 f.write(base64.b64decode(cover_data.split(',', 1)[1]))
-            profile.cover_url = url_for('static', filename=f'cover_pics/{filename}')
+            profile.cover_url = url_for('static', filename=f'cover_pics/{filename}') + f"?v={int(time.time())}"
 
         db.session.commit()
         flash('Your profile has been updated successfully.', 'success')

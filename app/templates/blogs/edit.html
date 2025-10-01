@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Edit Blog{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto">
+  <div class="bg-white rounded-xl shadow p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl font-semibold">Edit Blog</h1>
+      <a href="{{ url_for('blogs.detail', blog_id=blog.id) }}" class="text-sm text-gray-500 hover:underline">← Back to blog</a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-5" id="blog-form">
+      {{ form.hidden_tag() }}
+
+      <div>
+        {{ form.title.label(class_='block text-sm mb-1 font-medium') }}
+        {{ form.title(class_='w-full border rounded-lg p-3 shadow-sm focus:ring focus:ring-indigo-200') }}
+      </div>
+
+      <div>
+        {{ form.tags.label(class_='block text-sm mb-1 font-medium') }}
+        {{ form.tags(class_='w-full border rounded-lg p-3 shadow-sm focus:ring focus:ring-indigo-200') }}
+      </div>
+      
+      <div>
+        {{ form.category.label(class_='block text-sm mb-1 font-medium') }}
+        {{ form.category(class_='w-full border rounded-lg p-3 shadow-sm focus:ring focus:ring-indigo-200') }}
+      </div>
+
+      <div>
+        {{ form.cover_image.label(class_='block text-sm mb-1 font-medium') }}
+        {{ form.cover_image(class_='block w-full text-sm text-gray-600') }}
+        {% if blog.cover_image %}
+          <p class="text-xs text-gray-500 mt-1">Current cover image:</p>
+          <img src="{{ url_for('static', filename=blog.cover_images) }}" alt="{{ post.title }} Cover" class="mt-2 rounded-md max-h-48">
+        {% endif %}
+      </div>
+
+      <div class="flex items-center space-x-2">
+        {{ form.is_featured(class_='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500') }}
+        {{ form.is_featured.label(class_='text-sm text-gray-700') }}
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1 font-medium">Body</label>
+        <div id="editor-container" class="border rounded-lg bg-white min-h-[300px]"></div>
+        <input type="hidden" name="body" id="editor-field">
+      </div>
+
+      <div class="flex items-center justify-end">
+        {{ form.submit(class_='px-4 py-2 rounded bg-indigo-600 text-white shadow', id='submit-btn', value='Update Blog') }}
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
+<script>
+  // Safely pass blog body to JavaScript
+  const blogBody = {{ (blog.body or "")|tojson|safe }};
+  const DRAFT_KEY = `blog_draft_body_{{ blog.id }}`;
+  let editorInstance;
+
+  ClassicEditor
+    .create(document.querySelector('#editor-container'), {
+      // --- ADVANCED CONFIGURATION START ---
+
+      placeholder: 'Start writing your masterpiece here...',
+
+      // A more comprehensive toolbar for a rich article editing experience
+      toolbar: {
+        items: [
+          'heading', '|',
+          'bold', 'italic', 'underline', 'strikethrough', 'link', '|',
+          'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', '|',
+          'bulletedList', 'numberedList', 'outdent', 'indent', '|',
+          'blockQuote', 'insertTable', 'imageUpload', 'mediaEmbed', 'codeBlock', 'horizontalLine', '|',
+          'undo', 'redo', '|',
+          'sourceEditing' // A powerful tool for advanced users
+        ],
+        shouldNotGroupWhenFull: true // Ensures the toolbar wraps on smaller screens
+      },
+
+      // Configuration for specific plugins
+      heading: {
+        options: [
+          { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+          { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+          { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+          { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+        ]
+      },
+      image: {
+        toolbar: [
+          'imageStyle:inline',
+          'imageStyle:block',
+          'imageStyle:side',
+          '|',
+          'toggleImageCaption',
+          'imageTextAlternative'
+        ]
+      },
+      table: {
+        contentToolbar: [
+          'tableColumn',
+          'tableRow',
+          'mergeTableCells',
+          'tableCellProperties',
+          'tableProperties'
+        ]
+      }
+
+      // --- ADVANCED CONFIGURATION END ---
+    })
+    .then(editor => {
+      editorInstance = editor;
+      // Load from localStorage draft or original blog content
+      const savedDraft = localStorage.getItem(DRAFT_KEY);
+      editor.setData(savedDraft || blogBody);
+
+      // Auto-save draft on change
+      editor.model.document.on('change:data', () => {
+        localStorage.setItem(DRAFT_KEY, editor.getData());
+      });
+
+      // On submit, copy HTML to hidden input
+      document.getElementById('blog-form').addEventListener('submit', (e) => {
+        const html = editor.getData();
+        if (!html || html.trim() === '') {
+          e.preventDefault();
+          alert('Please write something in the blog body before publishing.');
+          return false;
+        }
+        document.getElementById('editor-field').value = html;
+        localStorage.removeItem(DRAFT_KEY);
+        document.getElementById('submit-btn').disabled = true;
+      });
+    })
+    .catch(error => console.error(error));
+</script>
+{% endblock %}

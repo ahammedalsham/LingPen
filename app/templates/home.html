@@ -4,60 +4,82 @@
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
 
-  <!-- Hero Section -->
-  <section class="relative overflow-hidden">
-    <!-- Animated Background: layered SVG blobs + IPA glyphs -->
-    <div aria-hidden="true" class="absolute inset-0 -z-10 pointer-events-none">
-      <!-- Soft blurred gradient blobs -->
-      <svg class="absolute -top-44 -left-36 w-[28rem] h-[28rem] opacity-40 blur-2xl animate-blob-slow" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        <defs>
-          <linearGradient id="g1" x1="0%" x2="100%" y1="0%" y2="100%">
-            <stop stop-color="#60a5fa" offset="0%" />
-            <stop stop-color="#7c3aed" offset="50%" />
-            <stop stop-color="#f472b6" offset="100%" />
-          </linearGradient>
-        </defs>
-        <g>
-          <path fill="url(#g1)" d="M421.6,346.8Q403,443.6,322.2,469Q241.4,494.4,171.7,452.9Q102,411.4,69.9,343.4Q37.8,275.4,78.9,200.6Q120,125.8,193.6,96.2Q267.2,66.6,339.8,92.8Q412.4,119,435.6,190Q458.8,261,421.6,346.8Z"></path>
-        </g>
-      </svg>
+  <!-- Modern React-driven Hero -->
+  <section id="react-hero-root" class="relative overflow-hidden">
+    <div id="HeroMount" data-register-url="{{ url_for('auth.register') }}" data-explore-anchor="#explore"></div>
 
-      <!-- Rotating large blur blob -->
-      <div class="absolute top-56 right-16 w-[36rem] h-[36rem] rounded-full bg-gradient-to-bl from-pink-300 via-purple-300 to-blue-300 opacity-20 blur-3xl animate-spin-slow"></div>
+    <script type="text/babel">
+      const { useEffect, useRef } = React;
 
-      <!-- Floating IPA glyphs (linguistic theme) -->
-      <div class="absolute inset-0 flex pointer-events-none">
-        <span class="ipa floating -left-10 top-20 text-6xl text-[rgba(15,23,42,0.06)]">/ŋ/</span>
-        <span class="ipa floating delay-1 left-1/4 top-40 text-5xl text-[rgba(15,23,42,0.05)]">/θ/</span>
-        <span class="ipa floating delay-2 left-1/2 top-8 text-7xl text-[rgba(15,23,42,0.04)]">/ɹ/</span>
-        <span class="ipa floating delay-3 right-14 top-56 text-6xl text-[rgba(15,23,42,0.05)]">/ʃ/</span>
-      </div>
-    </div>
+      function AnimatedBlob({className='', style={}}){
+        return (
+          <svg className={className} viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style={style}>
+            <defs>
+              <linearGradient id="h1" x1="0%" x2="100%" y1="0%" y2="100%">
+                <stop stopColor="#60a5fa" offset="0%" />
+                <stop stopColor="#7c3aed" offset="50%" />
+                <stop stopColor="#f472b6" offset="100%" />
+              </linearGradient>
+            </defs>
+            <g>
+              <path fill="url(#h1)" d="M421.6,346.8Q403,443.6,322.2,469Q241.4,494.4,171.7,452.9Q102,411.4,69.9,343.4Q37.8,275.4,78.9,200.6Q120,125.8,193.6,96.2Q267.2,66.6,339.8,92.8Q412.4,119,435.6,190Q458.8,261,421.6,346.8Z"></path>
+            </g>
+          </svg>
+        );
+      }
 
-    <!-- Hero Content -->
-    <div class="max-w-[85rem] mx-auto px-6 py-24 text-center">
-      <h1 class="font-extrabold text-gray-900 text-4xl md:text-6xl lg:text-7xl tracking-tight leading-tight">
-        Connect, Learn & Share <br>
-        <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient">
-          With Linguists Worldwide
-        </span>
-      </h1>
+      function Hero(){
+        const containerRef = useRef();
 
-      <p class="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-gray-700">
-        Join our global community. Explore posts, share research, and grow together.
-      </p>
+        useEffect(()=>{
+          // subtle entrance animation
+          const el = containerRef.current;
+          el.classList.add('opacity-0','translate-y-6');
+          requestAnimationFrame(()=>{
+            el.classList.remove('opacity-0');
+            el.classList.remove('translate-y-6');
+            el.classList.add('opacity-100');
+          });
+        },[]);
 
-      <div class="mt-8 flex justify-center gap-4">
-        <a href="{{ url_for('auth.register') }}"
-           class="px-6 py-3 rounded-xl bg-blue-600 text-white text-sm md:text-base font-semibold shadow-md hover:shadow-xl hover:bg-blue-700 transition transform hover:-translate-y-1">
-          Get Started →
-        </a>
-        <a href="#explore"
-           class="px-6 py-3 rounded-xl border border-gray-300 text-gray-800 text-sm md:text-base font-semibold bg-white/50 backdrop-blur-sm hover:bg-gray-100 transition transform hover:-translate-y-1">
-          Explore Content
-        </a>
-      </div>
-    </div>
+        const registerUrl = document.getElementById('HeroMount').dataset.registerUrl;
+        const exploreAnchor = document.getElementById('HeroMount').dataset.exploreAnchor;
+
+        return (
+          <div ref={containerRef} className="max-w-[85rem] mx-auto px-6 py-24 text-center relative">
+            <div className="absolute inset-0 -z-10 pointer-events-none">
+              <AnimatedBlob className="absolute -top-44 -left-36 w-[28rem] h-[28rem] opacity-40 blur-2xl animate-blob-slow" />
+              <div className="absolute top-56 right-16 w-[36rem] h-[36rem] rounded-full bg-gradient-to-bl from-pink-300 via-purple-300 to-blue-300 opacity-20 blur-3xl animate-spin-slow"></div>
+            </div>
+
+            <h1 className="font-extrabold text-gray-900 text-4xl md:text-6xl lg:text-7xl tracking-tight leading-tight">
+              Connect, Learn & Share <br/>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient">
+                With Linguists Worldwide
+              </span>
+            </h1>
+
+            <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-gray-700">
+              Join our global community. Explore posts, share research, and grow together.
+            </p>
+
+            <div className="mt-8 flex justify-center gap-4">
+              <a href={registerUrl}
+                 className="px-6 py-3 rounded-xl bg-blue-600 text-white text-sm md:text-base font-semibold shadow-md hover:shadow-xl hover:bg-blue-700 transition transform hover:-translate-y-1">
+                Get Started →
+              </a>
+              <a href={exploreAnchor}
+                 className="px-6 py-3 rounded-xl border border-gray-300 text-gray-800 text-sm md:text-base font-semibold bg-white/50 backdrop-blur-sm hover:bg-gray-100 transition transform hover:-translate-y-1">
+                Explore Content
+              </a>
+            </div>
+          </div>
+        );
+      }
+
+      // Mount
+      ReactDOM.createRoot(document.getElementById('HeroMount')).render(React.createElement(Hero));
+    </script>
   </section>
 
   <!-- Stats Section -->
@@ -94,7 +116,10 @@
       {% for user in users %}
   <div class="group card-animate bg-white/70 backdrop-blur-md rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:bg-white/90">
           {% if user.profile.photo_url %}
-            <img src="{{ user.profile.photo_url }}" class="w-20 h-20 mx-auto rounded-full border-4 border-white shadow mb-3 object-cover">
+            <div class="w-20 h-20 mx-auto rounded-full border-4 border-white shadow mb-3 overflow-hidden relative">
+              <div class="skeleton-avatar absolute inset-0"></div>
+              <img src="{{ user.profile.photo_url }}" class="w-20 h-20 mx-auto rounded-full object-cover avatar-img" onload="this.previousElementSibling.style.display='none'" onerror="this.previousElementSibling.style.display='none'">
+            </div>
           {% else %}
             <div class="w-20 h-20 mx-auto flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-bold mb-3">
               {{ (user.profile.first_name or user.email)[0] | upper }}
@@ -116,7 +141,7 @@
       {% for post in posts[:6] %}
   <div class="bg-white rounded-xl shadow card-animate p-5">
           <div class="flex items-center mb-3">
-            <img src="{{ post.user.profile.photo_url or url_for('static', filename='default-avatar.png') }}" class="w-10 h-10 rounded-full mr-3">
+            <img src="{{ post.user.profile.photo_url or url_for('static', filename='default-avatar.png') }}" alt="{{ post.user.profile.first_name or post.user.email }}'s avatar" class="w-10 h-10 rounded-full mr-3">
             <div>
               <p class="font-semibold">{{ post.user.profile.first_name or post.user.email }}</p>
               <p class="text-xs text-gray-500">{{ post.created_at.strftime("%b %d, %Y") }}</p>
@@ -136,11 +161,11 @@
       {% for blog in blogs[:6] %}
   <div class="bg-white rounded-xl shadow card-animate overflow-hidden">
           {% if blog.cover_image %}
-            <img src="{{ blog.cover_image }}" class="h-40 w-full object-cover hover:scale-105 transition-transform duration-400 ease-out">
+            <img src="{{ url_for('static', filename=blog.cover_image) }}" alt="{{ blog.title }} cover image" class="h-40 w-full object-cover hover:scale-105 transition-transform duration-400 ease-out">
           {% endif %}
           <div class="p-5">
             <h3 class="font-semibold text-lg">{{ blog.title }}</h3>
-            <p class="text-sm text-gray-600 mt-2">{{ blog.body[:100] }}...</p>
+            <p class="text-sm text-gray-600 mt-2">{{ blog.body[:100]|safe }}...</p>
             <a href="{{ url_for('blogs.detail', blog_id=blog.id) }}" class="text-blue-600 text-sm mt-3 inline-block">Read More →</a>
           </div>
         </div>

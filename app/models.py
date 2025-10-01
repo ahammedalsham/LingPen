@@ -115,27 +115,76 @@ class PostComment(db.Model):
         cascade="all, delete-orphan"
     )
 
-# Blogs & comments
+# Blogs, likes, comments, bookmarks
+
+# Association table for bookmarks
+blog_bookmarks = db.Table(
+    "blog_bookmarks",
+    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
+    db.Column("blog_id", db.Integer, db.ForeignKey("blog.id"), primary_key=True),
+    db.Column("created_at", db.DateTime, default=datetime.utcnow)
+)
+
+
 class Blog(db.Model):
+    __tablename__ = "blog"
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+
+    # Content
     title = db.Column(db.String(255), nullable=False)
     body = db.Column(db.Text, nullable=False)
+    excerpt = db.Column(db.String(500))
+    cover_image = db.Column(db.String(255))
+    tags = db.Column(db.String(255))  # Comma-separated tags
+    category = db.Column(db.String(100))  # e.g., Linguistics, Syntax, etc.
+    reading_time = db.Column(db.Integer)  # in minutes
+
+    # Metadata
+    is_featured = db.Column(db.Boolean, default=False)
+    views = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    # Relationships
     user = db.relationship("User", backref=db.backref("blogs", lazy="dynamic"))
-    likes = db.relationship("BlogLike", back_populates="blog", cascade='all, delete-orphan', lazy="dynamic")
-    comments = db.relationship("BlogComment", back_populates="blog", cascade='all, delete-orphan', lazy="dynamic")
+    likes = db.relationship("BlogLike", back_populates="blog", cascade="all, delete-orphan", lazy="dynamic")
+    comments = db.relationship("BlogComment", back_populates="blog", cascade="all, delete-orphan", lazy="dynamic")
+    bookmarked_by = db.relationship("User", secondary=blog_bookmarks,
+                                    backref=db.backref("saved_blogs", lazy="dynamic"))
+
+    # Utility methods
+    def set_excerpt(self, char_limit=200):
+        """Generate an excerpt from the blog body"""
+        self.excerpt = (self.body[:char_limit] + "...") if len(self.body) > char_limit else self.body
+
+    def set_reading_time(self):
+        """Estimate reading time (200 words/minute)"""
+        word_count = len(self.body.split())
+        self.reading_time = max(1, word_count // 200)
+
+    def like_count(self):
+        return self.likes.count()
+
+    def comment_count(self):
+        return self.comments.count()
+
 
 class BlogLike(db.Model):
+    __tablename__ = "blog_like"
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
     blog_id = db.Column(db.Integer, db.ForeignKey("blog.id"), nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     user = db.relationship("User", backref=db.backref("blog_likes", lazy="dynamic"))
     blog = db.relationship("Blog", back_populates="likes")
 
+
 class BlogComment(db.Model):
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
     blog_id = db.Column(db.Integer, db.ForeignKey("blog.id"), nullable=False, index=True)
@@ -145,7 +194,7 @@ class BlogComment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
-    user = db.relationship("User", back_populates="blog_comments")
+    user = db.relationship("User", back_populates='blog_comments')
     blog = db.relationship("Blog", back_populates="comments")
 
     replies = db.relationship(

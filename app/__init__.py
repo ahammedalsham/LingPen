@@ -14,7 +14,7 @@ def create_app(config_class=Config):
     login_manager.login_view = "auth.login"
 
     # Blueprints
-    from. blueprints.general.routes import bp as general_bp
+    from .blueprints.general.routes import bp as general_bp
     from .blueprints.auth.routes import bp as auth_bp
     from .blueprints.users.routes import bp as users_bp
     from .blueprints.posts.routes import bp as posts_bp

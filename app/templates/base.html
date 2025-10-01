@@ -8,9 +8,30 @@
   <!-- Alpine.js for lightweight reactivity (used by comment components) -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React for interactive UI components (UMD) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Babel for in-browser JSX transpile (development only) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- put this in your <head> (probably inside base.html) -->
+<script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman&display=swap" rel="stylesheet">
   <link rel="icon" href="{{ url_for('static', filename='logo/lingpen_logo.png') }}">
 </head>
 <body class="bg-gray-100 text-gray-900 flex flex-col min-h-screen">
+
+<style>
+  /* Skeleton shimmer for image placeholders */
+  .skeleton-avatar, .skeleton-cover {
+    background: linear-gradient(90deg, #f3f4f6 25%, #e6e6e9 37%, #f3f4f6 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.2s linear infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+</style>
 
 <!-- TOP NAVBAR -->
 <nav class="bg-white shadow-md border-b border-blue-200">
@@ -155,6 +176,9 @@
     {% endif %}
   {% endwith %}
 </div>
+
+<!-- React mount root for small global components (toasts, modals) -->
+<div id="GlobalUIRoot" data-current-year="{{ current_year }}" style="display:none"></div>
 
 
 <!-- MAIN CONTENT -->

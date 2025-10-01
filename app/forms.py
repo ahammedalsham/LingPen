@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, PasswordField, BooleanField, IntegerField, SubmitField, FileField, DateField
-from wtforms.validators import DataRequired, Length, EqualTo, NumberRange, Email
+from wtforms import StringField, TextAreaField, PasswordField, BooleanField, IntegerField, SubmitField, FileField, DateField, SelectField, HiddenField
+from wtforms.validators import DataRequired, Length, EqualTo, NumberRange, Email, Optional
 from wtforms.fields import DateTimeLocalField
 
 # Auth forms
@@ -34,10 +34,15 @@ class PostForm(FlaskForm):
 class BlogForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired(), Length(min=3, max=255)])
     body = TextAreaField('Write your blog', validators=[DataRequired()])
+    tags = StringField('Tags (comma-separated)', validators=[Length(max=255)])
+    category = SelectField('Category', choices =[('linguistics','Linguistics'), ('phonetics','Phonetics'), ('morphology','Morphology'), ('syntax','Syntax'), ('language_learning','Language Learning'), ('research', 'Research'), ('other','Other')], default='linguistics') # New category field
+    cover_image = FileField('Cover Image')
+    is_featured = BooleanField('Feature this blog')
     submit = SubmitField('Publish')
 
 class CommentForm(FlaskForm):
     body = TextAreaField('Comment', validators=[DataRequired(), Length(min=1, max=2000)])
+    parent_id = HiddenField('Parent Comment ID')
     submit = SubmitField('Comment')
 
 # Events & Courses forms
